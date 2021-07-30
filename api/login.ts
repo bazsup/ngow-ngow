@@ -17,9 +17,9 @@ module.exports = async (req, res) => {
     try {
         const client = InstagramClient.getInstance()
         await client.login(req.u, req.p)
-
-        res.status(204).send();
-    } catch {
-        res.status(401).json({ message: 'Unauthorized' })
+        res.status(200).send(client.getProfile());
+    } catch (err) {
+        console.error(err)
+        res.status(400).json({ message: 'Unauthorized' })
     }
 }

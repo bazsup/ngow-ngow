@@ -20,11 +20,13 @@
     "rollup-plugin-terser": "^7.0.0",
     "svelte": "^3.0.0",
     "svelte-check": "^2.0.0",
+    "svelte-navigator": "^3.1.5",
     "svelte-preprocess": "^4.0.0",
     "tslib": "^2.0.0",
     "typescript": "^4.0.0"
   },
   "dependencies": {
+    "axios": "^0.21.1",
     "instagram-private-api": "^1.45.1",
     "sirv-cli": "^1.0.0",
     "twind": "^0.16.16"
