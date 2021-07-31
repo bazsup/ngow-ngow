@@ -3,7 +3,7 @@
     import { credential, profile } from "../stores";
     import { useNavigate } from "svelte-navigator";
     import { login, twoFactorLogin } from "../serivces/login";
-import type { LoginResponse } from "../models/login.model";
+    import type { LoginResponse } from "../models/login.model";
 
     const styles = {
         input: apply`block w-full mb-2 py-1 px-2 rounded`,
@@ -20,54 +20,56 @@ import type { LoginResponse } from "../models/login.model";
     let hasTwoFactor = false;
 
     function clearForm() {
-        username = ''
-        password = ''
+        username = "";
+        password = "";
     }
 
     function loginSuccess(data: LoginResponse) {
         credential.set(data.accessToken);
-        profile.set(data.profile)
-        navigate('/profile', { replace: true });
+        profile.set(data.profile);
+        navigate("/profile", { replace: true });
     }
 
     function loginFail() {
-        hasError = true
-        loading = false
-        clearForm()
+        hasError = true;
+        loading = false;
+        clearForm();
     }
 
     async function handleRequiredTwoFactor(question) {
-        const code = window.prompt(question)
+        const code = window.prompt(question);
         twoFactorLogin(username, password, code)
             .then((resp) => {
-                hasTwoFactor = true
-                loginSuccess(resp.data)
+                hasTwoFactor = true;
+                loginSuccess(resp.data);
             })
             .catch((err) => {
-                console.error(err)
-                loginFail()
-            })
+                console.error(err);
+                loginFail();
+            });
     }
 
     async function handleLogin() {
         login(username, password)
-            .then(resp => {
-                loginSuccess(resp.data)
+            .then((resp) => {
+                loginSuccess(resp.data);
             })
             .catch(async (err) => {
                 if (err.response && err.response.status === 403) {
-                    return await handleRequiredTwoFactor(err.response.data.message)
+                    return await handleRequiredTwoFactor(
+                        err.response.data.message
+                    );
                 }
 
-                console.error(err)
-                loginFail()
-            })
+                console.error(err);
+                loginFail();
+            });
     }
 
     async function handleSubmit() {
         hasError = false;
         loading = true;
-        handleLogin()
+        handleLogin();
     }
 </script>
 
@@ -78,9 +80,12 @@ import type { LoginResponse } from "../models/login.model";
             <div class={tw`sm:w-96 w-full mx-auto shadow-xl px-3 py-5 rounded`}>
                 <p class={tw(styles.instagram, "mb-4 p-2")}>Login Instagram</p>
                 {#if loading}
-                    <div class={tw`text-xl flex h-28 justify-center items-center`}>Loading ...</div>
+                    <div
+                        class={tw`text-xl flex h-28 justify-center items-center`}
+                    >
+                        Loading ...
+                    </div>
                 {:else}
-                    
                     <form on:submit|preventDefault={handleSubmit}>
                         <input
                             class={tw(styles.input)}
