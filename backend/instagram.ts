@@ -85,9 +85,13 @@ export class InstagramClient implements SocialClient {
         console.log('followings:', (await this.ig.feed.accountFollowing().items()))
     }
 
-    async sendMessage() {
-        // const userId = await this.ig.user.getIdByUsername('')
-        const thread = this.ig.entity.directThread([''])
-        await thread.broadcastText('Message from API')
+    async sendMessage(receiverId: number, message: string) {
+        const thread = this.ig.entity.directThread([receiverId.toString()])
+        await thread.broadcastText(message)
+    }
+
+    async sendPhoto(receiverId: number, file: Buffer) {
+        const thread = this.ig.entity.directThread([receiverId.toString()])
+        await thread.broadcastPhoto({ file })
     }
 }

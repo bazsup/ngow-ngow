@@ -16,6 +16,7 @@
     let password: string;
     let loading = false;
     let hasError = false;
+    let hasTwoFactor = false;
 
     function clearForm() {
         username = ''
@@ -23,7 +24,7 @@
     }
 
     function loginSuccess(data) {
-        credential.set({username, password});
+        credential.set({username, password, hasTwoFactor});
         profile.set(data)
         navigate('/profile', { replace: true });
     }
@@ -38,6 +39,7 @@
         const code = window.prompt(question)
         twoFactorLogin(username, password, code)
             .then((resp) => {
+                hasTwoFactor = true
                 loginSuccess(resp.data)
             })
             .catch((err) => {

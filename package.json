@@ -29,6 +29,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "instagram-private-api": "^1.45.1",
+    "multiparty": "^4.2.2",
     "sirv-cli": "^1.0.0",
     "twind": "^0.16.16"
   }
