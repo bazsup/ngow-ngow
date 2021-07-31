@@ -9,6 +9,7 @@ module.exports = async (req, res) => {
         requireAuth(req)
     } catch (err) {
         if (err instanceof BaseException) {
+            console.error(err.code, err.message, err)
             return res.status(err.code).json({ message: err.message })
         }
         console.log(err)
@@ -17,21 +18,20 @@ module.exports = async (req, res) => {
         })
     }
 
-    const client = InstagramClient.getInstance()
-    client.login(req.u, req.p)
-        .then(() => {
-            res.status(200).send({
-                profile: client.getProfile(),
-                accessToken: encrypt(JSON.stringify({u: req.u, p: req.p, hasTwoFactor: false}))
-            });
-        })
-        .catch((err) => {
-            if (err instanceof BaseException) {
-                console.log('base exception')
-                return res.status(err.code).send({ message: err.message })
-            }
+    try {
+        const client = InstagramClient.getInstance()
+        await client.login(req.u, req.p)
+        res.status(200).send({
+            profile: client.getProfile(),
+            accessToken: encrypt(JSON.stringify({u: req.u, p: req.p, hasTwoFactor: false}))
+        });
+    } catch (err) {
+        if (err instanceof BaseException) {
+            console.log('base exception')
+            return res.status(err.code).send({ message: err.message })
+        }
 
-            console.error(err)
-            res.status(HttpStatus.BAD_REQUEST).json({ message: 'Unauthorized' })
-        })
+        console.error(err)
+        res.status(HttpStatus.BAD_REQUEST).json({ message: 'Unauthorized' })
+    }
 }
