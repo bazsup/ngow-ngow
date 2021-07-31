@@ -21,6 +21,7 @@ module.exports = async (req, res) => {
     try {
         const client = InstagramClient.getInstance()
         await client.login(req.u, req.p)
+        await client.logout()
         res.status(200).send({
             profile: client.getProfile(),
             accessToken: encrypt(JSON.stringify({u: req.u, p: req.p, hasTwoFactor: false}))

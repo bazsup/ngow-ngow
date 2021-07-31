@@ -40,7 +40,7 @@ module.exports = (req, res) => {
         const fileBuffer = fs.readFileSync(uploadedFile.path) 
         const receiverId = getReceiverId()
         await client.sendPhoto(receiverId, fileBuffer)
-
+        await client.logout()
         res.status(204).send()
     });
 }

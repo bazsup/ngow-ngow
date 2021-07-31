@@ -1,9 +1,10 @@
-import { AccountFollowingFeedResponseUsersItem, AccountRepositoryLoginResponseLogged_in_user, IgApiClient, IgLoginTwoFactorRequiredError } from 'instagram-private-api'
+import { AccountFollowingFeedResponseUsersItem, AccountRepositoryLoginResponseLogged_in_user, IgApiClient, IgLoginTwoFactorRequiredError, StatusResponse } from 'instagram-private-api'
 import constants, { TwoFactorMethod } from './constants';
 import { LoginTwoFactorRequiredError } from './exception';
 
 export interface SocialClient {
     login(username: string, password: string): Promise<void>
+    logout(): Promise<StatusResponse>
     getProfile(): void
     getFollowers(): Promise<void>
     getFollowings(): Promise<AccountFollowingFeedResponseUsersItem[]>
@@ -67,6 +68,10 @@ export class InstagramClient implements SocialClient {
                 trustThisDevice: '1',
             });
         }
+    }
+
+    logout() {
+        return this.ig.account.logout()
     }
 
     getProfile() {

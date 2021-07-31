@@ -25,6 +25,7 @@ module.exports = async (req, res) => {
         await login(req.token.hasTwoFactor, req.token.u, req.token.p)
         const client = InstagramClient.getInstance()
         await client.sendMessage(req.body.receiverId, req.body.message)
+        await client.logout()
 
         res.status(204).send();
     } catch (err) {

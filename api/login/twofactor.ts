@@ -24,6 +24,7 @@ module.exports = async (req, res) => {
         const client = InstagramClient.getInstance()
         await client.twoFactorLogin(req.u, req.p, req.body.code)
         console.log('success')
+        await client.logout()
         
         res.status(200).send({
             profile: mapProfile(client.getProfile()),
