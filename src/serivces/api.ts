@@ -7,9 +7,8 @@ export const instance = axios.create({
 })
 
 export const buildHeaders = () => {
-    const {username, password, hasTwoFactor} = get(credential)
+    const token = get(credential)
     return {
-        'Authorization': `${username},${password}`,
-        'hasTwoFactor': hasTwoFactor
+        'Authorization': token
     }
 }

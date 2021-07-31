@@ -2,6 +2,7 @@ import { InstagramClient } from '../../backend/instagram'
 import { BaseException } from '../../backend/exception'
 import requireAuth from '../../backend/requireAuth'
 import { HttpStatus } from '../../backend/constants'
+import { encrypt } from '../../backend/crypto'
 
 module.exports = async (req, res) => {
     try {
@@ -19,7 +20,10 @@ module.exports = async (req, res) => {
     const client = InstagramClient.getInstance()
     client.login(req.u, req.p)
         .then(() => {
-            res.status(200).send(client.getProfile());
+            res.status(200).send({
+                profile: client.getProfile(),
+                accessToken: encrypt(JSON.stringify({u: req.u, p: req.p, hasTwoFactor: false}))
+            });
         })
         .catch((err) => {
             if (err instanceof BaseException) {

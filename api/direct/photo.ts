@@ -1,9 +1,8 @@
 import constants, { HttpStatus } from "../../backend/constants"
 import { BaseException } from "../../backend/exception"
 import { InstagramClient } from "../../backend/instagram"
-import requireAuth from "../../backend/requireAuth"
+import requireAuth, { requireAuthHeaders } from "../../backend/requireAuth"
 import multiparty from 'multiparty'
-import util from 'util'
 import fs from 'fs'
 
 module.exports = (req, res) => {
@@ -17,16 +16,13 @@ module.exports = (req, res) => {
     let form = new multiparty.Form();
 
     form.parse(req, async (err, fields, files) => {
-        const hasData = fields.token && fields.twoFactor
-        if (!hasData && files?.file?.length === 0) {
+        if (files?.file?.length === 0) {
             res.status(HttpStatus.BAD_REQUEST).send({ message: 'Required field(s) not found' })
             return
         }
 
-        const [credentail] = fields.token
-        req.body = {token: credentail}
         try {
-            requireAuth(req)
+            requireAuthHeaders(req)
         } catch (err) {
             if (err instanceof BaseException) {
                 return res.status(err.code).json({ message: err.message })
@@ -37,10 +33,9 @@ module.exports = (req, res) => {
             })
         }
 
-        const hasTwoFactor = fields.twoFactor[0] === '1'
         const uploadedFile = files.file[0]
         
-        await login(hasTwoFactor, req.u, req.p)
+        await login(req.token.hasTwoFactor, req.token.u, req.token.p)
         const client = InstagramClient.getInstance()
         const fileBuffer = fs.readFileSync(uploadedFile.path) 
         const receiverId = getReceiverId()

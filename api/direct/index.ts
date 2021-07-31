@@ -1,7 +1,7 @@
 import constants, { HttpStatus } from "../../backend/constants"
 import { BaseException } from "../../backend/exception"
 import { InstagramClient } from "../../backend/instagram"
-import requireAuth from "../../backend/requireAuth"
+import requireAuth, { requireAuthHeaders } from "../../backend/requireAuth"
 
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
@@ -9,9 +9,8 @@ module.exports = async (req, res) => {
         return;
     }
 
-    req.body.token = req.headers.authorization
     try {
-        requireAuth(req)
+        requireAuthHeaders(req)
     } catch (err) {
         if (err instanceof BaseException) {
             return res.status(err.code).json({ message: err.message })
@@ -22,10 +21,8 @@ module.exports = async (req, res) => {
         })
     }
 
-    const hasTwoFactor = req.headers.hastwofactor === 'true'
-
     try {
-        await login(hasTwoFactor, req.u, req.p)
+        await login(req.token.u, req.token.p, req.hasTwoFactor)
         const client = InstagramClient.getInstance()
         await client.sendMessage(req.body.receiverId, req.body.message)
 

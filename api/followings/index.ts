@@ -15,10 +15,8 @@ module.exports = async (req, res) => {
         })
     }
 
-    const hasTwoFactor = req.headers.hastwofactor === 'true'
-
     try {
-        await login(hasTwoFactor, req.u, req.p)
+        await login(req.token.hasTwoFactor, req.token.u, req.token.p)
         const client = InstagramClient.getInstance()
         const followings = await client.getFollowings()
 

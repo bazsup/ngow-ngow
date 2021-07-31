@@ -3,6 +3,7 @@
     import { credential, profile } from "../stores";
     import { useNavigate } from "svelte-navigator";
     import { login, twoFactorLogin } from "../serivces/login";
+import type { LoginResponse } from "../models/login.model";
 
     const styles = {
         input: apply`block w-full mb-2 py-1 px-2 rounded`,
@@ -23,9 +24,9 @@
         password = ''
     }
 
-    function loginSuccess(data) {
-        credential.set({username, password, hasTwoFactor});
-        profile.set(data)
+    function loginSuccess(data: LoginResponse) {
+        credential.set(data.accessToken);
+        profile.set(data.profile)
         navigate('/profile', { replace: true });
     }
 
