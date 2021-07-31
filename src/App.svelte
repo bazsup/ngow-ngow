@@ -6,12 +6,10 @@
 </script>
 
 <Router>
-	<Link to="/profile">profile</Link>
-	<Link to="/">Index</Link>
 	<Route path="/">
 		<Login />
 	</Route>
-
+	
 	<PrivateRoute path="/profile">
 		<Profile />
 	</PrivateRoute>

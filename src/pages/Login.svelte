@@ -1,8 +1,8 @@
 <script lang="ts">
     import { tw, apply } from "twind/css";
     import { credential, profile } from "../stores";
-    import { useNavigate, Link } from "svelte-navigator";
-    import { login } from "../serivces/login";
+    import { useNavigate } from "svelte-navigator";
+    import { login, twoFactorLogin } from "../serivces/login";
 
     const styles = {
         input: apply`block w-full mb-2 py-1 px-2 rounded`,
@@ -22,23 +22,49 @@
         password = ''
     }
 
-    async function handleSubmit() {
-        hasError = false;
-        loading = true;
-        login(username, password)
-            .then(resp => {
-                credential.set({username, password});
-                profile.set(resp.data)
-                navigate('/profile', { replace: true });
+    function loginSuccess(data) {
+        credential.set({username, password});
+        profile.set(data)
+        navigate('/profile', { replace: true });
+    }
+
+    function loginFail() {
+        hasError = true
+        loading = false
+        clearForm()
+    }
+
+    async function handleRequiredTwoFactor(question) {
+        const code = window.prompt(question)
+        twoFactorLogin(username, password, code)
+            .then((resp) => {
+                loginSuccess(resp.data)
             })
             .catch((err) => {
                 console.error(err)
-                hasError = true
+                loginFail()
             })
-            .finally(() => {
-                loading = false
-                clearForm()
+    }
+
+    async function handleLogin() {
+        login(username, password)
+            .then(resp => {
+                loginSuccess(resp.data)
             })
+            .catch(async (err) => {
+                if (err.response && err.response.status === 403) {
+                    return await handleRequiredTwoFactor(err.response.data.message)
+                }
+
+                console.error(err)
+                loginFail()
+            })
+    }
+
+    async function handleSubmit() {
+        hasError = false;
+        loading = true;
+        handleRequiredTwoFactor('Enter code')
     }
 </script>
 

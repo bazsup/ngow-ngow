@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "build": "rollup -c",
-    "dev": "rollup -c -w",
+    "dev": "rollup -h",
     "start": "sirv public --no-clear",
-    "check": "svelte-check --tsconfig ./tsconfig.json"
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "script": "tsc-node"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
