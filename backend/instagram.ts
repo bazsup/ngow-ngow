@@ -1,13 +1,12 @@
-import { AccountRepositoryLoginResponseLogged_in_user, IgApiClient, IgLoginTwoFactorRequiredError } from 'instagram-private-api'
-import * as Bluebird from 'bluebird';
-import constants, { HttpStatus, TwoFactorMethod } from './constants';
-import { BaseException, LoginTwoFactorRequiredError } from './exception';
+import { AccountFollowingFeedResponseUsersItem, AccountRepositoryLoginResponseLogged_in_user, IgApiClient, IgLoginTwoFactorRequiredError } from 'instagram-private-api'
+import constants, { TwoFactorMethod } from './constants';
+import { LoginTwoFactorRequiredError } from './exception';
 
 export interface SocialClient {
     login(username: string, password: string): Promise<void>
     getProfile(): void
     getFollowers(): Promise<void>
-    getFollowings(): Promise<void>
+    getFollowings(): Promise<AccountFollowingFeedResponseUsersItem[]>
 }
 
 export class InstagramClient implements SocialClient {
@@ -57,7 +56,6 @@ export class InstagramClient implements SocialClient {
                 throw err
             }
             const { username, totp_two_factor_on, two_factor_identifier } = err.response.body.two_factor_info
-            
 
             const verificationMethod = totp_two_factor_on ? TwoFactorMethod.THIRD_PARTY : TwoFactorMethod.SMS
 
@@ -74,15 +72,14 @@ export class InstagramClient implements SocialClient {
     getProfile() {
         return this.loggedInUser
         console.log('user:', this.loggedInUser)
-        // this.ig.account.twoFactorLogin()
     }
 
     async getFollowers() {
         console.log('followers:', (await this.ig.feed.accountFollowers().items()).length)
     }
 
-    async getFollowings() {
-        console.log('followings:', (await this.ig.feed.accountFollowing().items()))
+    getFollowings(): Promise<AccountFollowingFeedResponseUsersItem[]> {
+        return this.ig.feed.accountFollowing().items()
     }
 
     async sendMessage(receiverId: number, message: string) {

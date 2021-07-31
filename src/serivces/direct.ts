@@ -1,17 +1,13 @@
-import { instance } from "./api"
+import { buildHeaders, instance } from "./api"
 import { credential } from '../stores'
 import { get } from "svelte/store"
 
 export const sendMessage = (receiverId: number, message: string) => {
-    const {username, password, hasTwoFactor} = get(credential)
     return instance.post('/direct', {
         receiverId: receiverId,
         message: message
     }, {
-        headers: {
-            'Authorization': `${username},${password}`,
-            'hasTwoFactor': hasTwoFactor
-        }
+        headers: buildHeaders()
     })
 }
 

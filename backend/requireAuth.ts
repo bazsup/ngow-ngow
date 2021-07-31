@@ -18,4 +18,18 @@ export const requireAuth = (req) => {
     req.p = something[1]
 }
 
+export const requireAuthHeaders = (req) => {
+    const token = req.headers.authorization
+    if (token === undefined) {
+        throw new BaseException(HttpStatus.BAD_REQUEST, constants.requireAuth)
+    }
+
+    const something = token.split(',')
+    if (something.length !== 2) {
+        throw new BaseException(HttpStatus.BAD_REQUEST, constants.requireAuth)
+    }
+    req.u = something[0]
+    req.p = something[1]
+}
+
 export default requireAuth
