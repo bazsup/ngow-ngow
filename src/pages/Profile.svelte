@@ -5,6 +5,7 @@
     import { getFollowings } from "../serivces/followings";
     import * as direct from "../serivces/direct";
     import type { Profile } from "../models/profile.model";
+    import axios from "axios";
 
     let fetching = false;
     let followings: Profile[];
@@ -29,7 +30,7 @@
     }
 
     function randomFollowing() {
-        const index = getRandomIntInclusive(0, followings.length);
+        const index = getRandomIntInclusive(0, followings.length - 1);
         result = followings[index];
     }
 
@@ -45,12 +46,19 @@
         }, 500);
     }
 
-    let sending = false
+    let sending = false;
+    let message = "ทักคัฟ";
+
+    function randomMessage() {
+        axios.get("/api/randomMessage").then((response) => {
+            message = response.data;
+        });
+    }
 
     function sendMessage() {
-        sending = true
+        sending = true;
         direct
-            .sendMessage(result.pk, "ทักคัฟ")
+            .sendMessage(result.pk, message)
             .then(() => {
                 alert("Message Sent!");
             })
@@ -58,9 +66,8 @@
                 alert("Send Message Failed, please try again.");
             })
             .finally(() => {
-                sending = false
-            })
-
+                sending = false;
+            });
     }
 </script>
 
@@ -88,7 +95,7 @@
     </header>
 
     <main>
-        <div class={tw`container pt-40 text-center mx-auto`}>
+        <div class={tw`container pt-20 text-center mx-auto`}>
             {#if randoming}
                 ระบบกำลังทำการสุ่ม...
             {:else}
@@ -100,7 +107,9 @@
                 </button>
             {/if}
             {#if result}
-                <div class={tw`shadow-xl inline-block mt-4 p-10`}>
+                <div
+                    class={tw`shadow-xl block mt-4 py-10 px-3 sm:w-1/4 w-full mx-auto`}
+                >
                     <h2
                         class={tw`text-2xl p-3 font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-yellow-400 to-pink-400`}
                     >
@@ -117,12 +126,23 @@
                     >
                         (@{result.username})
                     </a>
+                    <div class={tw`bg-gray-200 mt-2 py-2`}>
+                        " {message} "
+                    </div>
+                    <div class={tw`text-left`}>
+                        <!-- svelte-ignore a11y-missing-attribute -->
+                        <a
+                            on:click={randomMessage}
+                            class={tw`text-pink-500 underline`}>🔄 สุ่มคำใหม่</a
+                        >
+                    </div>
+
                     <button
                         disabled={sending}
                         class={tw`bg-pink-600 active:bg-pink-400 disabled:text-white hover:bg-pink-400 transition-all duration-300 focus:outline-none block mx-auto mt-4 w-full font-bold text-white py-2 rounded-lg`}
                         on:click={sendMessage}
                     >
-                        {sending ? 'Sending..' : 'DM'}
+                        {sending ? "Sending.." : "DM"}
                     </button>
                 </div>
             {/if}
