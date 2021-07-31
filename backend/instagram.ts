@@ -31,7 +31,7 @@ export class InstagramClient implements SocialClient {
             if (err instanceof IgLoginTwoFactorRequiredError) {
                 const { totp_two_factor_on } = err.response.body.two_factor_info
                 const message = totp_two_factor_on ? constants.twoFactorTotpMethod : constants.twoFactorSmsMethod
-                throw new LoginTwoFactorRequiredError(message, err.response.body)
+                throw new LoginTwoFactorRequiredError(message)
             }
             throw err
         }

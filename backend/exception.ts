@@ -11,10 +11,8 @@ export class BaseException extends Error {
 }
 
 export class LoginTwoFactorRequiredError extends BaseException {
-    errorResponse: AccountRepositoryLoginErrorResponse
     static code = HttpStatus.FORBIDDEN
-    constructor(messsage: string, errorResponse: AccountRepositoryLoginErrorResponse) {
+    constructor(messsage: string) {
         super(LoginTwoFactorRequiredError.code, messsage)
-        this.errorResponse = errorResponse
     }
 }
