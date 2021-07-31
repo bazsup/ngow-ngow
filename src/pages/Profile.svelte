@@ -30,7 +30,7 @@
 
     function randomFollowing() {
         const index = getRandomIntInclusive(0, followings.length);
-        result = followings[1];
+        result = followings[index];
     }
 
     function handleUserWantToRandom() {
