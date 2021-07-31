@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { profile } from "../stores";
+    import { credential, profile } from "../stores";
     import { tw } from "twind";
     import { onMount } from "svelte";
+    import { useNavigate } from "svelte-navigator";
     import { getFollowings } from "../serivces/followings";
     import * as direct from "../serivces/direct";
     import type { Profile } from "../models/profile.model";
@@ -10,7 +11,7 @@
     let fetching = false;
     let followings: Profile[];
     let randoming = false;
-    let result: Profile = null
+    let result: Profile = null;
 
     onMount(() => {
         fetching = true;
@@ -69,6 +70,12 @@
                 sending = false;
             });
     }
+
+    const navigate = useNavigate();
+    function logout() {
+        credential.set(null);
+        navigate("/", { replace: true });
+    }
 </script>
 
 <div>
@@ -87,9 +94,12 @@
                 </a>
             </div>
             <div>
-                <button class={tw`text-white bg-red-400 px-3 py-2 rounded`}
-                    >Logout</button
+                <button
+                    on:click={logout}
+                    class={tw`text-white bg-red-400 px-3 py-2 rounded`}
                 >
+                    Logout
+                </button>
             </div>
         </div>
     </header>
