@@ -67,7 +67,7 @@ import type { LoginResponse } from "../models/login.model";
     async function handleSubmit() {
         hasError = false;
         loading = true;
-        handleRequiredTwoFactor('Enter code')
+        handleLogin()
     }
 </script>
 
