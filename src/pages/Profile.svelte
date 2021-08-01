@@ -52,7 +52,12 @@
         randoming = true;
         let id = setInterval(() => {
             if (!fetching) {
-                result = randomProfile(followings.filter(p => p.is_bestie));
+                const closeFriend = followings.filter(p => p.is_bestie)
+                if (closeFriend.length === 0) {
+                    alert('Sorry you don\'t have any close friend T_T')
+                } else {
+                    result = randomProfile(followings.filter(p => p.is_bestie));
+                }
                 randoming = false;
                 clearInterval(id);
             }
