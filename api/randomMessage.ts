@@ -1,6 +1,6 @@
 import messages from '../backend/messages'
 
-var rand = weightedRand({ 0: 0.8, 1: 0.2 });
+var rand = weightedRand({ 0: 0.7, 1: 0.3 });
 
 module.exports = (req, res) => {
     const type = rand()
