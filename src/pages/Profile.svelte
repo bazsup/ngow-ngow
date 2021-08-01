@@ -48,18 +48,21 @@
     }
 
     let sending = false;
-    let message = "ทักคัฟ";
+    let messageContent: {type: string, content: string} = {type: 'message', content: 'ทักคัฟ'};
+    let isRandomingMessage = false
 
     function randomMessage() {
+        isRandomingMessage = true
         axios.get("/api/randomMessage").then((response) => {
-            message = response.data;
+            messageContent = response.data;
+            isRandomingMessage = false
         });
     }
 
     function sendMessage() {
         sending = true;
         direct
-            .sendMessage(result.pk, message)
+            .sendMessage(result.pk, messageContent.content)
             .then(() => {
                 alert("Message Sent!");
             })
@@ -69,6 +72,30 @@
             .finally(() => {
                 sending = false;
             });
+    }
+
+    function sendPhoto() {
+        sending = true;
+        direct
+            .sendPhoto2(result.pk, messageContent.content)
+            .then(() => {
+                alert("Message Sent!");
+            })
+            .catch(() => {
+                alert("Send Message Failed, please try again.");
+            })
+            .finally(() => {
+                sending = false;
+            });
+    }
+
+    function sendDirect() {
+        if (messageContent.type === 'message') {
+            sendMessage()
+        }
+        if (messageContent.type === 'photo') {
+            sendPhoto()
+        }
     }
 
     const navigate = useNavigate();
@@ -105,7 +132,7 @@
     </header>
 
     <main>
-        <div class={tw`container pt-20 text-center mx-auto`}>
+        <div class={tw`container pt-10 text-center mx-auto`}>
             {#if randoming}
                 ระบบกำลังทำการสุ่ม...
             {:else}
@@ -118,7 +145,7 @@
             {/if}
             {#if result}
                 <div
-                    class={tw`shadow-xl block mt-4 py-10 px-3 sm:w-1/4 w-full mx-auto`}
+                    class={tw`shadow-xl block mt-4 py-10 px-3 sm:w-2/4 lg:w-1/4 w-full mx-auto`}
                 >
                     <h2
                         class={tw`text-2xl p-3 font-extrabold text-transparent bg-clip-text bg-gradient-to-l from-yellow-400 to-pink-400`}
@@ -136,9 +163,22 @@
                     >
                         (@{result.username})
                     </a>
-                    <div class={tw`bg-gray-200 mt-2 py-2`}>
-                        " {message} "
+                    {#if isRandomingMessage}
+                    <div>
+                        <p class={tw`py-2`}>กำลังสุ่มข้อความ</p>
                     </div>
+                    {:else}
+                        {#if messageContent.type === 'message'}
+                        <div class={tw`bg-gray-200 mt-2 py-2`}>
+                            " {messageContent.content} "
+                        </div>
+                        {/if}
+                        {#if messageContent.type === 'photo'}
+                        <div class={tw`border`}>
+                            <img src={messageContent.content} alt="random stuff" />
+                        </div>
+                        {/if}
+                    {/if}
                     <div class={tw`text-left`}>
                         <!-- svelte-ignore a11y-missing-attribute -->
                         <a
@@ -150,7 +190,7 @@
                     <button
                         disabled={sending}
                         class={tw`bg-pink-600 active:bg-pink-400 disabled:text-white hover:bg-pink-400 transition-all duration-300 focus:outline-none block mx-auto mt-4 w-full font-bold text-white py-2 rounded-lg`}
-                        on:click={sendMessage}
+                        on:click={sendDirect}
                     >
                         {sending ? "Sending.." : "DM"}
                     </button>
