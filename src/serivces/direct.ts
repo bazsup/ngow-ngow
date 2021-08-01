@@ -20,3 +20,13 @@ export const sendPhoto = (file: File) => {
     }
     return instance.post('/direct/photo', formData, config)
 }
+
+export const sendPhoto2 = (receiverId: number, url: string) => {
+    const config = {
+        headers: buildHeaders()
+    }
+    return instance.post('/direct/photo2', {
+        receiverId,
+        url
+    }, config)
+}
