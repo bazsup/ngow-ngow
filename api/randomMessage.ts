@@ -5,13 +5,13 @@ var rand = weightedRand({ 0: 0.8, 1: 0.2 });
 module.exports = (req, res) => {
     const type = rand()
     if (type === 0) {
-        const index = getRandomIntInclusive(0, messages.messages.length)
+        const index = getRandomIntInclusive(0, messages.messages.length - 1)
         res.send({
             type: 'message',
             content: messages.messages[index].content
         });
     } else {
-        const index = getRandomIntInclusive(0, messages.photos.length)
+        const index = getRandomIntInclusive(0, messages.photos.length - 1)
         res.send({
             type: 'photo',
             content: messages.photos[index].url
