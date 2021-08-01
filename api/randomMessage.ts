@@ -1,10 +1,15 @@
 import messages from '../backend/messages'
 
-var rand = weightedRand({ 0: 0.7, 1: 0.3 });
+const Category = {
+    MESSAGE: '0',
+    PHOTO: '1'
+}
+var rand = weightedRand({ [Category.MESSAGE]: 0.7, [Category.PHOTO]: 0.3 });
+
 
 module.exports = (req, res) => {
-    const type = rand()
-    if (type === 0) {
+    const category = rand()
+    if (category === Category.MESSAGE) {
         const index = getRandomIntInclusive(0, messages.messages.length - 1)
         res.send({
             type: 'message',
