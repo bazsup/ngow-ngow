@@ -30,9 +30,9 @@
         return Math.floor(Math.random() * (max - min + 1) + min); //The maximum is inclusive and the minimum is inclusive
     }
 
-    function randomFollowing() {
-        const index = getRandomIntInclusive(0, followings.length - 1);
-        result = followings[index];
+    function randomProfile(profiles: Profile[]) {
+        const index = getRandomIntInclusive(0, profiles.length - 1);
+        return profiles[index];
     }
 
     function handleUserWantToRandom() {
@@ -40,7 +40,19 @@
         randoming = true;
         let id = setInterval(() => {
             if (!fetching) {
-                randomFollowing();
+                result = randomProfile(followings);
+                randoming = false;
+                clearInterval(id);
+            }
+        }, 500);
+    }
+
+    function handleUserWantToRandomCloseFriend() {
+        result = null;
+        randoming = true;
+        let id = setInterval(() => {
+            if (!fetching) {
+                result = randomProfile(followings.filter(p => p.is_bestie));
                 randoming = false;
                 clearInterval(id);
             }
@@ -48,14 +60,17 @@
     }
 
     let sending = false;
-    let messageContent: {type: string, content: string} = {type: 'message', content: 'ทักคัฟ'};
-    let isRandomingMessage = false
+    let messageContent: { type: string; content: string } = {
+        type: "message",
+        content: "ทักคัฟ",
+    };
+    let isRandomingMessage = false;
 
     function randomMessage() {
-        isRandomingMessage = true
+        isRandomingMessage = true;
         axios.get("/api/randomMessage").then((response) => {
             messageContent = response.data;
-            isRandomingMessage = false
+            isRandomingMessage = false;
         });
     }
 
@@ -90,11 +105,11 @@
     }
 
     function sendDirect() {
-        if (messageContent.type === 'message') {
-            sendMessage()
+        if (messageContent.type === "message") {
+            sendMessage();
         }
-        if (messageContent.type === 'photo') {
-            sendPhoto()
+        if (messageContent.type === "photo") {
+            sendPhoto();
         }
     }
 
@@ -136,12 +151,20 @@
             {#if randoming}
                 ระบบกำลังทำการสุ่ม...
             {:else}
-                <button
-                    on:click={handleUserWantToRandom}
-                    class={tw`text-4xl block mx-auto font-extrabold text-white bg-green-300 active:bg-green-500 focus:outline-none border-none px-10 py-4 rounded-xl`}
-                >
-                    สุ่มทัก
-                </button>
+                <div class={tw`flex flex-col sm:flex-row justify-center`}>
+                    <button
+                        on:click={handleUserWantToRandom}
+                        class={tw`text-3xl inline m-1 font-extrabold text-white transition-all bg-pink-300 active:bg-pink-500 focus:outline-none border-none px-5 py-3 rounded-xl`}
+                    >
+                        สุ่มทัก
+                    </button>
+                    <button
+                        on:click={handleUserWantToRandomCloseFriend}
+                        class={tw`text-3xl inline m-1 font-extrabold text-white transition-all bg-green-300 active:bg-green-500 focus:outline-none border-none px-10 py-3 rounded-xl`}
+                    >
+                        สุ่มทัก close friend
+                    </button>
+                </div>
             {/if}
             {#if result}
                 <div
@@ -164,19 +187,22 @@
                         (@{result.username})
                     </a>
                     {#if isRandomingMessage}
-                    <div>
-                        <p class={tw`py-2`}>กำลังสุ่มข้อความ</p>
-                    </div>
+                        <div>
+                            <p class={tw`py-2`}>กำลังสุ่มข้อความ</p>
+                        </div>
                     {:else}
-                        {#if messageContent.type === 'message'}
-                        <div class={tw`bg-gray-200 mt-2 py-2`}>
-                            " {messageContent.content} "
-                        </div>
+                        {#if messageContent.type === "message"}
+                            <div class={tw`bg-gray-200 mt-2 py-2`}>
+                                " {messageContent.content} "
+                            </div>
                         {/if}
-                        {#if messageContent.type === 'photo'}
-                        <div class={tw`border`}>
-                            <img src={messageContent.content} alt="random stuff" />
-                        </div>
+                        {#if messageContent.type === "photo"}
+                            <div class={tw`border`}>
+                                <img
+                                    src={messageContent.content}
+                                    alt="random stuff"
+                                />
+                            </div>
                         {/if}
                     {/if}
                     <div class={tw`text-left`}>

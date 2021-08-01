@@ -7,12 +7,13 @@ export interface SocialClient {
     logout(): Promise<StatusResponse>
     getProfile(): void
     getFollowers(): Promise<void>
-    getFollowings(): Promise<AccountFollowingFeedResponseUsersItem[]>
+    getFollowings(): Promise<IGProfile[]>
 }
 
 export class InstagramClient implements SocialClient {
     private ig: IgApiClient
     private loggedInUser: AccountRepositoryLoginResponseLogged_in_user
+    private myFollowings: AccountFollowingFeedResponseUsersItem[]
     private constructor() {
         this.ig = new IgApiClient()
     }
@@ -79,12 +80,22 @@ export class InstagramClient implements SocialClient {
         console.log('user:', this.loggedInUser)
     }
 
+    async closeFriends(profiles: AccountFollowingFeedResponseUsersItem[]): Promise<FriendShips> {
+        const pks = profiles.map((profile) => profile.pk)
+        const friendships: FriendShips = (await this.ig.friendship.showMany(pks))
+        return friendships
+    }
+
     async getFollowers() {
         console.log('followers:', (await this.ig.feed.accountFollowers().items()).length)
     }
 
-    getFollowings(): Promise<AccountFollowingFeedResponseUsersItem[]> {
-        return this.ig.feed.accountFollowing().items()
+    async getFollowings(): Promise<IGProfile[]> {
+        this.myFollowings = await this.ig.feed.accountFollowing().items()
+        const friendships = await this.closeFriends(this.myFollowings)
+        return this.myFollowings.map((profile) => {
+            return {...profile, is_bestie: friendships[profile.pk].is_bestie}
+        })
     }
 
     async sendMessage(receiverId: number, message: string) {
@@ -96,4 +107,16 @@ export class InstagramClient implements SocialClient {
         const thread = this.ig.entity.directThread([receiverId.toString()])
         await thread.broadcastPhoto({ file })
     }
+}
+
+interface IGProfile extends Omit<AccountFollowingFeedResponseUsersItem, 'checkFollow'|'checkUnfollow'> {
+    is_bestie: boolean
+}
+
+interface FriendShip {
+    is_bestie: boolean
+}
+
+type FriendShips = {
+    [key: string]: FriendShip
 }
